@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    ports:
+      - "3306:3306" # Permite que você conecte ao banco usando ferramentas locais (DBeaver, Workbench)
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: meu_banco_dados
+      MYSQL_USER: usuario_db
+      MYSQL_PASSWORD: senha_db
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=db # O host deve ser exatamente o nome do serviço do MySQL no docker-compose
+      - DB_USER=usuario_db
+      - DB_PASSWORD=senha_db
+      - DB_NAME=meu_banco_dados
+      - DB_PORT=3306
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - backend
+
+volumes:
+  mysql_data: # Garante que os dados do seu banco não sumam quando o container for desligado
