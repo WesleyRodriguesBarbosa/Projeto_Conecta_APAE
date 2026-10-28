@@ -47,5 +47,18 @@ services:
     depends_on:
       - backend
 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: conecta_apae-phpmyadmin
+    restart: always
+    environment:
+      - PMA_HOST=db              # Aponta para o nome do serviço do MySQL acima
+      - PMA_PORT=3306
+      - MYSQL_ROOT_PASSWORD=root_password # Permite que você acesse com o usuário root se precisar
+    ports:
+      - "8080:80"                # Porta onde você vai acessar no seu navegador
+    depends_on:
+      - db
+
 volumes:
-  mysql_data: # Garante que os dados do seu banco não sumam quando o container for desligado
+  mysql_data:
